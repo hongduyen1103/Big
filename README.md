@@ -110,42 +110,7 @@ Hệ thống Smart Job Market Intelligence System được thiết kế với ki
 
 **Hình 1.3: Data Flow Pipeline của hệ thống**
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Data Sources  │───▶│  API Gateway    │───▶│   Kafka Queue   │
-│                 │    │  (FastAPI)      │    │                 │
-│ • Job Websites  │    │ • Authentication │    │ • Topics       │
-│ • Security Logs │    │ • Rate Limiting │    │ • Partitions    │
-│ • API Feeds     │    │ • Multi-tenant  │    │ • Replication   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                        │                      │
-         ▼                        ▼                      ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│Security Analysis│───▶│Tenant Processing│───▶│  Distributed    │
-│                 │    │                 │    │   Storage       │
-│ • Threat Detect │    │ • Data Routing  │    │                 │
-│ • Pattern Match │    │ • Isolation     │    │ • HDFS         │
-│ • ML Scoring    │    │ • Validation    │    │ • PostgreSQL   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                        │                      │
-         ▼                        ▼                      ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   ML Processing │───▶│   Indexing     │───▶│ Visualization   │
-│                 │    │                 │    │                 │
-│ • Spark ML      │    │ • Elasticsearch │    │ • Kibana       │
-│ • Streaming     │    │ • Search        │    │ • Dashboards    │
-│ • Predictions   │    │ • Aggregations  │    │ • Real-time    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                                        │
-                                                        ▼
-                                               ┌─────────────────┐
-                                               │   Alert System  │
-                                               │                 │
-                                               │ • Notifications │
-                                               │ • Email/Slack   │
-                                               │ • Escalation    │
-                                               └─────────────────┘
-```
+
 
 **Chú thích cho Hình 1.3:**
 - **Mũi tên:** Hướng chảy dữ liệu từ nguồn đến đích cuối
@@ -279,54 +244,7 @@ HDFS được cấu hình với:
 
 **Hình 1.5: API Gateway Architecture**
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    EXTERNAL CLIENTS                     │
-│  (Web Apps, Mobile Apps, Third-party Services)          │
-└─────────────────────┬───────────────────────────────────┘
-                      │ HTTPS Requests
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                 NGINX LOAD BALANCER                      │
-│  • SSL Termination                                      │
-│  • Request Routing                                      │
-│  • DDoS Protection                                      │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                 FASTAPI APPLICATION                      │
-│                                                         │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐ │
-│  │  Middleware │    │  Routing   │    │  Security   │ │
-│  │             │    │             │    │             │ │
-│  │ • CORS      │───▶│ • Endpoint  │───▶│ • JWT Auth  │ │
-│  │ • Logging   │    │   Matching  │    │ • Rate Lim  │ │
-│  │ • Compression│    │ • Validation│    │ • RBAC      │ │
-│  └─────────────┘    └─────────────┘    └─────────────┘ │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                 BUSINESS LOGIC                          │
-│                                                         │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐ │
-│  │  Services   │    │  Repositories│    │  External  │ │
-│  │             │    │             │    │  APIs       │ │
-│  │ • Kafka Prod│───▶│ • Database  │───▶│ • Kafka     │ │
-│  │ • ML Models │    │ • Cache     │    │ • Elastic   │ │
-│  │ • Alert Sys │    │ • Storage   │    │ • Third-party│ │
-│  └─────────────┘    └─────────────┘    └─────────────┘ │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                 RESPONSE FORMATTING                     │
-│  • JSON Serialization                                   │
-│  • Error Handling                                       │
-│  • Pagination                                           │
-└─────────────────────────────────────────────────────────┘
-```
+
 
 #### 1.3.7. Alert Management System
 
@@ -391,51 +309,7 @@ Các dashboard chính:
 
 **Hình 1.4: Security Threat Detection Flow**
 
-```
-┌─────────────────────┐
-│   Incoming Request  │
-│  (API Gateway)      │
-└─────────┬───────────┘
-          │
-          ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│  Authentication     │────▶│   JWT Validation    │
-│  & Authorization    │     │   (RSA-256)        │
-└─────────┬───────────┘     └─────────┬───────────┘
-          │                           │
-          ▼                           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│   Rate Limiting     │     │   Tenant Routing    │
-│   (Redis-based)     │     │   & Isolation       │
-└─────────┬───────────┘     └─────────┬───────────┘
-          │                           │
-          ▼                           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│ Security Analysis   │────▶│  Threat Detection   │
-│                     │     │                     │
-│ • Pattern Matching  │     │ • ML Classification │
-│ • Signature Check   │     │ • Anomaly Detection │
-│ • Payload Analysis  │     │ • Behavioral Analysis│
-└─────────┬───────────┘     └─────────┬───────────┘
-          │                           │
-          ▼                           ▼
-    ┌─────────────┐             ┌─────────────┐
-    │   ALLOW     │             │   BLOCK     │
-    │             │             │             │
-    │ • Log Event │             │ • Generate  │
-    │ • Kafka Msg │             │   Alert     │
-    │ • Continue  │             │ • Rate Limit│
-    └─────────────┘             └─────────────┘
-          │                           │
-          ▼                           ▼
-    ┌─────────────┐             ┌─────────────┐
-    │   Response  │             │  Alert Sys  │
-    │             │             │             │
-    │ • Success   │             │ • Email     │
-    │ • Data      │             │ • Slack     │
-    │             │             │ • Dashboard │
-    └─────────────┘             └─────────────┘
-```
+
 
 **Bảng 1.1: Các loại Attack Patterns được phát hiện**
 
@@ -669,14 +543,27 @@ Hệ thống được triển khai trên nền tảng ảo hóa VirtualBox với
 ##### Bước 1: Chuẩn bị VirtualBox
 
 **1.1 Fix VirtualBox kernel module:**
-
+- Cập nhật package list: `sudo apt update`
+- Cài đặt kernel headers: `sudo apt install linux-headers-$(uname -r)`
+- Cài đặt DKMS: `sudo apt install dkms`
+- Reinstall VirtualBox: `sudo apt install --reinstall virtualbox-dkms`
+- Rebuild kernel modules: `sudo /sbin/vboxconfig`
+- Verify installation: `vboxmanage --version`
 
 **1.2 Thêm user vào group vboxusers:**
+- Add current user to vboxusers group: `sudo usermod -aG vboxusers $USER`
+- Logout and login again, or run: `newgrp vboxusers`
+- Verify membership: `groups | grep vboxusers`
 
 
 ##### Bước 2: Tải Ubuntu Server ISO
 
 **2.1 Download Ubuntu Server 22.04.5 LTS:**
+- Tạo thư mục downloads: `mkdir -p ~/Documents/ISOs`
+- Navigate to directory: `cd ~/Documents/ISOs`
+- Download ISO: `wget https://releases.ubuntu.com/22.04/ubuntu-22.04.5-live-server-amd64.iso`
+- Verify download: `ls -lh ubuntu-22.04.5-live-server-amd64.iso`
+- Expected size: approximately 2.6GB
 
 
 ##### Bước 3: Tạo và cấu hình Master VM
@@ -713,7 +600,10 @@ Hệ thống được triển khai trên nền tảng ảo hóa VirtualBox với
 8. Chờ cài đặt hoàn tất
 
 **4.2 Cấu hình sau cài đặt:**
-
+- Login with credentials: hadoop/hadoop
+- Update system: `sudo apt update && sudo apt upgrade -y`
+- Install essential tools: `sudo apt install nano wget curl net-tools htop openssh-server -y`
+- Verify SSH service: `sudo systemctl status ssh`
 
 **4.3 Tạo snapshot:**
 - VirtualBox → master VM → Snapshots → Take
@@ -753,538 +643,558 @@ Hệ thống được triển khai trên nền tảng ảo hóa VirtualBox với
 ##### Bước 7: Cấu hình Worker nodes
 
 **7.1 Cấu hình Worker1:**
-
+- Start Worker1 VM and login: hadoop/hadoop
+- Change hostname: `sudo hostnamectl set-hostname worker1`
+- Edit netplan config: `sudo nano /etc/netplan/00-installer-config.yaml`
+- Update IP address to: `172.16.232.102/22`
+- Apply network config: `sudo netplan apply`
+- Test connectivity: `ping -c 3 master`
+- Verify hostname: `hostname`
 
 **7.2 Cấu hình Worker2:**
+- Start Worker2 VM and login: hadoop/hadoop
+- Change hostname: `sudo hostnamectl set-hostname worker2`
+- Edit netplan config: `sudo nano /etc/netplan/00-installer-config.yaml`
+- Update IP address to: `172.16.232.103/22`
+- Apply network config: `sudo netplan apply`
+- Test connectivity: `ping -c 3 master`
+- Verify hostname: `hostname`
 
 
 ##### Bước 8: Cài đặt Java và Python
 
 **8.1 Cài đặt trên tất cả VMs:**
-
+- Install OpenJDK 11: `sudo apt install openjdk-11-jdk -y`
+- Verify Java installation: `java -version`
+- Install Python 3 and pip: `sudo apt install python3 python3-pip -y`
+- Verify Python installation: `python3 --version`
+- Check pip version: `pip3 --version`
 
 **8.2 Cấu hình biến môi trường:**
+- Edit bashrc: `nano ~/.bashrc`
+- Add Java environment variables:
+  
+export HADOOP_HOME=/opt/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+export HDFS_NAMENODE_USER=hadoop
+export HDFS_DATANODE_USER=hadoop
+export HDFS_SECONDARYNAMENODE_USER=hadoop
+export YARN_RESOURCEMANAGER_USER=hadoop
+export YARN_NODEMANAGER_USER=hadoop
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://master:9000</value>
+  </property>
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value>/tmp/hadoop</value>
+  </property>
+  <property>
+    <name>hadoop.http.staticuser.user</name>
+    <value>hadoop</value>
+  </property>
+</configuration>
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property>
+    <name>dfs.replication</name>
+    <value>2</value>
+  </property>
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>file:///data/hadoop/namenode</value>
+  </property>
+  <property>
+    <name>dfs.namenode.http-address</name>
+    <value>master:9870</value>
+  </property>
+  <property>
+    <name>dfs.permissions.enabled</name>
+    <value>false</value>
+  </property>
+</configuration>
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property>
+    <name>dfs.replication</name>
+    <value>2</value>
+  </property>
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>file:///data/hadoop/datanode</value>
+  </property>
+  <property>
+    <name>dfs.permissions.enabled</name>
+    <value>false</value>
+  </property>
+</configuration>
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property>
+    <name>yarn.resourcemanager.hostname</name>
+    <value>master</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>8192</value>
+  </property>
+</configuration>
+xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+</configuration>
+
+worker1
+worker2
+
+export SPARK_HOME=/opt/spark
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+export PYSPARK_PYTHON=/usr/bin/python3
+export SPARK_LOCAL_IP=$(hostname -I | awk '{print $1}')
+
+worker1
+worker2
+yaml
+cluster.name: bigdata-cluster
+node.name: es-master
+node.roles: [master, data]
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+discovery.seed_hosts: ["master", "worker1", "worker2"]
+cluster.initial_master_nodes: ["es-master"]
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: false
+path.data: /data/elasticsearch
+path.logs: /data/elasticsearch/logs
+bootstrap.memory_lock: false
+yaml
+cluster.name: bigdata-cluster
+node.name: es-worker1  # es-worker2 for worker2
+node.roles: [data]
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+discovery.seed_hosts: ["master", "worker1", "worker2"]
+xpack.security.enabled: false
+path.data: /data/elasticsearch
+path.logs: /data/elasticsearch/logs
+bootstrap.memory_lock: false
+yaml
+server.host: "0.0.0.0"
+server.port: 5601
+server.name: "kibana-master"
+elasticsearch.hosts: ["http://master:9200"]
+logging:
+  appenders:
+    file:
+      type: file
+      fileName: /data/kibana/kibana.log
+      layout:
+        type: json
+  root:
+    appenders:
+      - default
+      - file
+    level: info
+
+export KAFKA_HOME=/opt/kafka
+export PATH=$PATH:$KAFKA_HOME/bin
+export ZOOKEEPER_HOME=/opt/kafka
+properties
+dataDir=/data/zookeeper
+clientPort=2181
+maxClientCnxns=0
+tickTime=2000
+initLimit=10
+syncLimit=5
+
+# Cluster configuration
+server.1=master:2888:3888
+server.2=worker1:2888:3888
+server.3=worker2:2888:3888
+
+# Enable commands
+4lw.commands.whitelist=*
+properties
+broker.id=1
+listeners=PLAINTEXT://master:9092
+advertised.listeners=PLAINTEXT://master:9092
+zookeeper.connect=master:2181,worker1:2181,worker2:2181
+zookeeper.connection.timeout.ms=18000
+
+log.dirs=/data/kafka
+num.partitions=3
+default.replication.factor=3
+min.insync.replicas=2
+
+delete.topic.enable=true
+auto.create.topics.enable=false
+python
+class Settings:
+    API_TITLE = "BigData Security Monitoring API"
+    API_VERSION = "1.0.0"
+    KAFKA_BOOTSTRAP_SERVERS = ["master:9092", "worker1:9092", "worker2:9092"]
+    KAFKA_TOPICS = {
+        "RAW_LOGS": "web-attack-logs",
+        "PROCESSED_EVENTS": "processed-security-events",
+        "ALERTS": "security-alerts"
+    }
+    SECRET_KEY = "your-secret-key-change-in-production"
+    RATE_LIMIT_PER_MINUTE = 100
+    SUPPORTED_TENANTS = ["company_a", "company_b", "company_c"]
+
+settings = Settings()
+python
+from kafka import KafkaProducer
+import json
+from config.settings import settings
+
+class KafkaProducerService:
+    def __init__(self):
+        self.producer = KafkaProducer(
+            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+            acks='all',
+            retries=3
+        )
+
+    def send_log(self, topic: str, message: dict, key: str = None, tenant_id: str = None):
+        if tenant_id:
+            message['tenant_id'] = tenant_id
+
+        future = self.producer.send(topic=topic, key=key, value=message)
+        record_metadata = future.get(timeout=10)
+        return {
+            "success": True,
+            "topic": record_metadata.topic,
+            "partition": record_metadata.partition,
+            "offset": record_metadata.offset
+        }
+
+kafka_producer = KafkaProducerService()
+python
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer
+from models.request_models import WebLog, APIResponse
+from services.kafka_service import kafka_producer
+from config.settings import settings
+from utils.security import verify_token, rate_limit
+
+router = APIRouter(prefix="/api/v1/security")
+security = HTTPBearer()
+
+@router.post("/log", response_model=APIResponse)
+@rate_limit(limit=settings.RATE_LIMIT_PER_MINUTE)
+async def ingest_security_log(
+    log: WebLog,
+    tenant_id: str,
+    credentials = Depends(security)
+):
+    try:
+        payload = verify_token(credentials.credentials)
+        if not payload:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        result = kafka_producer.send_log(
+            topic=settings.KAFKA_TOPICS["RAW_LOGS"],
+            message=log.dict(),
+            key=log.source_ip,
+            tenant_id=tenant_id
+        )
+
+        return APIResponse(
+            success=True,
+            message="Log ingested successfully",
+            data={"log_id": log.source_ip}
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/health")
+async def health_check():
+    return APIResponse(
+        success=True,
+        message="API Gateway is running",
+        data={"status": "healthy"}
+    )
+python
+from fastapi import FastAPI
+from routes.security_routes import router as security_router
+from config.settings import settings
+
+app = FastAPI(
+    title=settings.API_TITLE,
+    version=settings.API_VERSION
+)
+
+app.include_router(security_router)
+
+@app.get("/")
+async def root():
+    return {
+        "message": "BigData Security Monitoring API",
+        "version": settings.API_VERSION,
+        "docs": "/docs"
+    }
+python
+#!/usr/bin/env python3
+"""
+Job Market Data Crawler - Thu thập dữ liệu từ TopCV
+"""
+
+import requests
+from bs4 import BeautifulSoup
+import json
+import time
+from datetime import datetime
+import logging
+
+class TopCVCrawler:
+    def __init__(self):
+        self.base_url = "https://www.topcv.vn"
+        self.session = requests.Session()
+        self.session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+        })
+
+        logging.basicConfig(
+            filename='crawler.log',
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger(__name__)
+
+    def crawl_jobs(self, max_pages=10):
+        jobs = []
+        for page in range(1, max_pages + 1):
+            try:
+                url = f"{self.base_url}/tim-viec-lam-it-phan-mem?page={page}"
+                response = self.session.get(url, timeout=30)
+                response.raise_for_status()
+
+                soup = BeautifulSoup(response.content, 'html.parser')
+                job_cards = soup.find_all('div', class_='job-item')
+
+                for card in job_cards:
+                    job_data = self.extract_job_data(card)
+                    if job_data:
+                        jobs.append(job_data)
+
+                self.logger.info(f"Collected {len(job_cards)} jobs from page {page}")
+                time.sleep(2)
+
+            except Exception as e:
+                self.logger.error(f"Error crawling page {page}: {str(e)}")
+                continue
+
+        return jobs
+
+    def extract_job_data(self, job_card):
+        try:
+            title_elem = job_card.find('h3', class_='title')
+            company_elem = job_card.find('a', class_='company')
+            salary_elem = job_card.find('div', class_='salary')
+            location_elem = job_card.find('div', class_='location')
+
+            if not title_elem or not company_elem:
+                return None
+
+            return {
+                'job_id': f"topcv_{int(time.time())}_{hash(title_elem.text)}",
+                'title': title_elem.text.strip(),
+                'company': company_elem.text.strip(),
+                'location': location_elem.text.strip() if location_elem else "Unknown",
+                'salary': salary_elem.text.strip() if salary_elem else "Negotiable",
+                'source': 'topcv',
+                'crawled_at': datetime.now().isoformat(),
+                'url': self.base_url + title_elem.find('a')['href'] if title_elem.find('a') else ""
+            }
+        except Exception as e:
+            self.logger.error(f"Error extracting job data: {str(e)}")
+            return None
+
+    def save_to_json(self, jobs, filename=None):
+        if not filename:
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f'jobs_{timestamp}.json'
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(jobs, f, ensure_ascii=False, indent=2)
+
+        self.logger.info(f"Saved {len(jobs)} jobs to {filename}")
+        return filename
+
+if __name__ == "__main__":
+    crawler = TopCVCrawler()
+    jobs = crawler.crawl_jobs(max_pages=5)
+    filename = crawler.save_to_json(jobs)
+    print(f"Completed! Collected {len(jobs)} jobs, saved to {filename}")
+python
+#!/usr/bin/env python3
+"""
+Spark Job Data Processor - Xử lý dữ liệu với Spark ML
+"""
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.ml.feature import StringIndexer, VectorAssembler
+from pyspark.ml.regression import RandomForestRegressor
+from pyspark.ml.classification import RandomForestClassifier
+from pyspark.ml.evaluation import RegressionEvaluator, MulticlassClassificationEvaluator
+import logging
+
+class SparkJobProcessor:
+    def __init__(self):
+        self.spark = SparkSession.builder \
+            .appName("JobMarketProcessor") \
+            .config("spark.es.nodes", "master") \
+            .config("spark.es.port", "9200") \
+            .getOrCreate()
+
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+
+    def load_data(self, input_path):
+        try:
+            df = self.spark.read.json(input_path)
+            self.logger.info(f"Loaded {df.count()} records from {input_path}")
+            return df
+        except Exception as e:
+            self.logger.error(f"Error loading data: {e}")
+            return None
+
+    def clean_data(self, df):
+        df_clean = df.dropna(subset=['title', 'company'])
+        df_clean = df_clean.withColumn('title_clean',
+            regexp_replace('title', '[^a-zA-Z0-9\\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]', ''))
+
+        df_clean = df_clean.withColumn('salary_min',
+            when(col('salary').contains('-'), split(col('salary'), '-')[0])
+            .otherwise('0'))
+
+        df_clean = df_clean.withColumn('salary_max',
+            when(col('salary').contains('-'), split(col('salary'), '-')[1])
+            .otherwise(col('salary_min')))
+
+        df_clean = df_clean.withColumn('salary_min', regexp_replace('salary_min', '[^0-9]', '').cast('int'))
+        df_clean = df_clean.withColumn('salary_max', regexp_replace('salary_max', '[^0-9]', '').cast('int'))
+        df_clean = df_clean.withColumn('salary_avg',
+            (col('salary_min') + col('salary_max')) / 2)
+
+        self.logger.info(f"Data cleaning completed: {df_clean.count()} records")
+        return df_clean
+
+    def feature_engineering(self, df):
+        indexers = [
+            StringIndexer(inputCol='location', outputCol='location_index', handleInvalid='keep'),
+            StringIndexer(inputCol='company', outputCol='company_index', handleInvalid='keep')
+        ]
+
+        for indexer in indexers:
+            model = indexer.fit(df)
+            df = model.transform(df)
+
+        assembler = VectorAssembler(
+            inputCols=['location_index', 'company_index'],
+            outputCol='features',
+            handleInvalid='keep'
+        )
+
+        df_featured = assembler.transform(df)
+        self.logger.info("Feature engineering completed")
+        return df_featured
+
+    def train_salary_model(self, df):
+        df_salary = df.filter(col('salary_avg').isNotNull())
+
+        if df_salary.count() == 0:
+            self.logger.warning("No salary data available for training")
+            return None
+
+        train_data, test_data = df_salary.randomSplit([0.8, 0.2], seed=42)
+
+        rf = RandomForestRegressor(
+            featuresCol='features',
+            labelCol='salary_avg',
+            numTrees=100,
+            maxDepth=10,
+            seed=42
+        )
+
+        model = rf.fit(train_data)
+
+        predictions = model.transform(test_data)
+        evaluator = RegressionEvaluator(
+            labelCol='salary_avg',
+            predictionCol='prediction',
+            metricName='rmse'
+        )
+
+        rmse = evaluator.evaluate(predictions)
+        self.logger.info(".2f"
+
+        model.write().overwrite().save('/models/salary_predictor')
+        return model
+
+    def save_to_elasticsearch(self, df, index_name='processed_jobs'):
+        try:
+            df.write \
+                .format("org.elasticsearch.spark.sql") \
+                .option("es.nodes", "master") \
+                .option("es.port", "9200") \
+                .option("es.resource", index_name) \
+                .option("es.mapping.id", "job_id") \
+                .mode("overwrite") \
+                .save()
+
+            self.logger.info(f"Saved {df.count()} records to Elasticsearch index: {index_name}")
+
+        except Exception as e:
+            self.logger.error(f"Error saving to Elasticsearch: {e}")
+
+    def run_pipeline(self, input_path):
+        self.logger.info("=== Starting Job Market Data Processing Pipeline ===")
+
+        df = self.load_data(input_path)
+        if df is None:
+            return
+
+        df_clean = self.clean_data(df)
+        df_featured = self.feature_engineering(df_clean)
+
+        salary_model = self.train_salary_model(df_featured)
+
+        if salary_model:
+            df_featured = salary_model.transform(df_featured)
+
+        self.save_to_elasticsearch(df_featured)
+
+        self.logger.info("=== Pipeline completed successfully ===")
+
+if __name__ == "__main__":
+    import sys
+
+    processor = SparkJobProcessor()
+    input_path = sys.argv[1] if len(sys.argv) > 1 else 'hdfs://master:9000/raw-data/topcv/*.json'
+    processor.run_pipeline(input_path)
 
-
-##### Bước 9: Cấu hình SSH passwordless
-
-**9.1 Tạo SSH key trên tất cả VMs:**
-
-
-**9.2 Test SSH:**
-
-
-### 2.3. Cài đặt và cấu hình Hadoop
-
-#### 2.3.1. Download và cài đặt Hadoop
-
-**Trên tất cả 3 VMs:**
-
-
-#### 2.3.2. Cấu hình biến môi trường Hadoop
-
-**Thêm vào ~/.bashrc trên tất cả VMs:**
-
-
-#### 2.3.3. Cấu hình Hadoop files
-
-**hadoop-env.sh (tất cả VMs):**
-
-
-**core-site.xml (tất cả VMs):**
-
-
-**hdfs-site.xml (Master):**
-
-
-**hdfs-site.xml (Worker1 & Worker2):**
-
-
-**yarn-site.xml (tất cả VMs):**
-
-
-**mapred-site.xml (tất cả VMs):**
-
-
-**workers file (chỉ Master):**
-
-
-#### 2.3.4. Khởi tạo và test Hadoop
-
-**Tạo thư mục dữ liệu:**
-
-
-**Format và khởi động HDFS:**
-
-
-**Test Hadoop:**
-
-
-### 2.4. Cài đặt và cấu hình Spark
-
-#### 2.4.1. Download và cài đặt Spark
-
-**Trên tất cả VMs:**
-
-
-#### 2.4.2. Cấu hình Spark
-
-**Biến môi trường (tất cả VMs):**
-
-
-**spark-env.sh (tất cả VMs):**
-
-
-**spark-defaults.conf (chỉ Master):**
-
-
-**workers file (chỉ Master):**
-
-
-**Tạo thư mục Spark:**
-
-
-#### 2.4.3. Khởi động và test Spark
-
-**Khởi động Spark cluster:**
-
-
-**Workers:**
-
-
-**Test Spark:**
-
-
-### 2.5. Cài đặt và cấu hình Elasticsearch
-
-#### 2.5.1. Download và cài đặt Elasticsearch
-
-**Trên tất cả VMs:**
-
-
-#### 2.5.2. Cấu hình system limits
-
-**Trên tất cả VMs:**
-
-
-#### 2.5.3. Cấu hình Elasticsearch
-
-**elasticsearch.yml (Master):**
-
-
-**elasticsearch.yml (Worker1 & Worker2):**
-
-
-**JVM options:**
-
-
-**Tạo thư mục dữ liệu:**
-
-
-#### 2.5.4. Khởi động và test Elasticsearch
-
-**Khởi động cluster:**
-
-
-**Test cluster:**
-
-
-### 2.6. Cài đặt và cấu hình Kibana
-
-#### 2.6.1. Download và cài đặt Kibana
-
-**Chỉ trên Master:**
-
-
-#### 2.6.2. Cấu hình Kibana
-
-**kibana.yml:**
-
-
-**Tạo thư mục logs:**
-
-
-#### 2.6.3. Khởi động và test Kibana
-
-**Khởi động Kibana:**
-
-
-**Test truy cập:**
-- URL: http://172.16.232.101:5601
-- Tạo Data View cho test-index
-- Tạo visualizations cơ bản
-
-### 2.7. Cài đặt và cấu hình Kafka cluster
-
-#### 2.7.1. Download và cài đặt Kafka
-
-**Trên tất cả 3 VMs:**
-
-
-#### 2.7.2. Cấu hình biến môi trường Kafka
-
-**Thêm vào ~/.bashrc trên tất cả VMs:**
-
-
-#### 2.7.3. Cấu hình Zookeeper cluster
-
-**zookeeper.properties (tất cả VMs):**
-
-
-**Tạo myid files:**
-
-
-#### 2.7.4. Cấu hình Kafka brokers
-
-**server.properties (Master - broker.id=1):**
-
-
-**server.properties (Worker1 & Worker2 - tương tự với broker.id=2,3)**
-
-#### 2.7.5. Tạo Kafka topics
-
-
-
-#### 2.7.6. Khởi động Kafka cluster
-
-**Thứ tự khởi động:**
-1. Zookeeper trên tất cả nodes
-2. Kafka brokers trên tất cả nodes
-3. Test connectivity
-
-
-
-### 2.8. Cài đặt và cấu hình API Gateway
-
-#### 2.8.1. Cài đặt FastAPI và dependencies
-
-**Trên Master VM:**
-
-
-#### 2.8.2. Cấu hình API Gateway
-
-**Tạo cấu trúc thư mục:**
-
-
-**config/settings.py:**
-
-
-#### 2.8.3. Tạo Kafka Producer Service
-
-**services/kafka_service.py:**
-
-
-#### 2.8.4. Tạo API Routes
-
-**routes/security_routes.py:**
-
-
-#### 2.8.5. Khởi động API Gateway
-
-**app/main.py:**
-
-
-**Chạy API Gateway:**
-
-
-### 2.9. Cài đặt Python packages và ứng dụng
-
-#### 2.7.1. Cài đặt Python packages
-
-**Trên tất cả VMs:**
-
-
-#### 2.7.2. Triển khai ứng dụng crawler
-
-**Tạo thư mục ứng dụng (Master):**
-
-
-**Nội dung crawler.py:**
-
-
-#### 2.7.3. Triển khai ứng dụng xử lý dữ liệu
-
-**Tạo file spark_processor.py:**
-
-
-### 2.8. Triển khai Flask API
-
-**Tạo file app.py trên Master:**
-
-
-### 2.9. Test hệ thống hoàn chỉnh
-
-#### 2.9.1. Test data pipeline
-
-**Chạy crawler:**
-
-
-**Upload dữ liệu lên HDFS:**
-
-
-**Chạy Spark processor:**
-
-
-**Kiểm tra dữ liệu trong Elasticsearch:**
-
-
-#### 2.9.1. Test Kafka cluster
-
-**Test Kafka connectivity:**
-
-
-#### 2.9.2. Test API Gateway
-
-**Test API endpoints:**
-
-
-#### 2.9.3. Test Security Processing Pipeline
-
-**Test end-to-end pipeline:**
-
-
-#### 2.9.4. Test Multi-tenant Features
-
-**Test tenant management:**
-
-
-#### 2.9.3. Test Kibana dashboards
-
-**Truy cập Kibana:**
-- URL: http://172.16.232.101:5601
-- Tạo Data View cho processed_jobs index
-- Tạo các visualizations:
-  - Job postings over time (Line chart)
-  - Top companies by job count (Bar chart)
-  - Salary distribution (Histogram)
-  - Geographic distribution (Map)
-
----
-
-## CHƯƠNG 3: NHẬN XÉT, ĐÁNH GIÁ VÀ HƯỚNG PHÁT TRIỂN
-
-### 3.1. Nhận xét và đánh giá
-
-#### 3.1.1. Điểm mạnh của hệ thống
-
-**Về mặt kỹ thuật:**
-- Kiến trúc end-to-end hoàn chỉnh từ data ingestion đến user interface
-- Tích hợp thành công các công nghệ Big Data hiện đại (Hadoop, Spark, Elasticsearch)
-- Khả năng mở rộng và fault tolerance với 3-node cluster
-- Real-time processing capabilities với streaming data
-- Sử dụng containerization và orchestration với VirtualBox
-
-**Về mặt xử lý dữ liệu:**
-- Pipeline xử lý dữ liệu hoàn chỉnh với data cleaning và validation
-- Machine learning models với độ chính xác cao (85% cho salary prediction)
-- Feature engineering và preprocessing chất lượng
-- Business intelligence thực tế và có giá trị ứng dụng
-
-**Về mặt ứng dụng:**
-- RESTful API với 10+ endpoints phục vụ external applications
-- Kibana dashboards trực quan với 50+ visualizations
-- Web UI demo đầy đủ tính năng
-- Hướng dẫn triển khai chi tiết và thực tế
-
-**Về mặt triển khai:**
-- Hướng dẫn cài đặt step-by-step cho môi trường production
-- Snapshot system để backup và restore
-- Monitoring và troubleshooting guides
-- Scalable architecture cho future growth
-
-#### 3.1.2. Điểm hạn chế
-
-**Về mặt kỹ thuật:**
-- Phụ thuộc vào cấu trúc website của các trang tuyển dụng (có thể thay đổi)
-- Yêu cầu tài nguyên hệ thống lớn (48 CPU cores, 128GB RAM cho host)
-- Độ phức tạp trong deployment và maintenance
-- Khó scale lên cluster lớn hơn trong môi trường production
-
-**Về mặt dữ liệu:**
-- Chất lượng dữ liệu phụ thuộc hoàn toàn vào nguồn thu thập
-- Xử lý ngôn ngữ tiếng Việt còn hạn chế (cần cải thiện analyzer)
-- Thiếu dữ liệu lịch sử dài hạn để training models tốt hơn
-- Dữ liệu có thể bị outdated nhanh chóng trong thị trường lao động
-
-**Về mặt mô hình:**
-- Độ chính xác của ML models cần cải thiện thêm (RMSE ~2M VND)
-- Cold start problem cho user mới (không có historical data)
-- Interpretability của một số models chưa cao
-- Chưa có A/B testing để validate model performance
-
-**Về mặt infrastructure:**
-- Single point of failure trong kiến trúc hiện tại
-- Chưa có automated backup và disaster recovery
-- Monitoring system còn cơ bản
-- Security hardening chưa đầy đủ
-
-### 3.2. Hướng phát triển
-
-#### 3.2.1. Nâng cao chất lượng dữ liệu
-
-**Mở rộng nguồn dữ liệu:**
-- Vieclam24h, VietnamWorks, Indeed, JobStreet, LinkedIn Jobs
-- Tích hợp data enrichment từ Glassdoor và Company reviews
-- Thu thập dữ liệu real-time với Kafka streaming
-- Sử dụng APIs chính thức thay vì web scraping
-
-**Cải thiện xử lý ngôn ngữ:**
-- Sử dụng ViTokenizer và PhoBERT cho xử lý tiếng Việt
-- Named Entity Recognition cho company names và skills
-- Sentiment analysis cho job descriptions
-- Text classification tự động cho job categories
-
-**Quality assurance:**
-- Automated data validation pipelines
-- Duplicate detection algorithms
-- Outlier detection và data cleansing
-- Data lineage tracking
-
-#### 3.2.2. Cải thiện mô hình AI/ML
-
-**Deep Learning approaches:**
-- BERT và Transformer models cho text understanding
-- Computer vision cho resume parsing
-- Recommendation systems với collaborative filtering
-- Time series forecasting với LSTM và NeuralProphet
-
-**Model enhancement:**
-- Ensemble learning (Voting, Stacking, Bagging)
-- Hyperparameter optimization
-- Cross-validation và model validation
-- Model interpretability với SHAP và LIME
-
-**Real-time ML:**
-- Online learning cho model updates
-- Streaming ML với Apache Kafka + Spark Streaming
-- Model serving với TensorFlow Serving
-- A/B testing framework
-
-#### 3.2.3. Mở rộng tính năng
-
-**Mobile application:**
-- React Native hoặc Flutter app
-- Job search và application features
-- Career guidance chatbot
-- Push notifications cho job alerts
-
-**Advanced analytics:**
-- Predictive career paths
-- Skills gap analysis cá nhân hóa
-- Company insights và competitor analysis
-- Industry trend forecasting
-
-**Social features:**
-- Job seeker profiles và networking
-- Company pages và employer branding
-- Reviews và ratings system
-- Community forums
-
-#### 3.2.4. Infrastructure improvements
-
-**Cloud migration:**
-- AWS EMR, Google Dataproc, Azure HDInsight
-- Serverless architecture với AWS Lambda
-- Auto-scaling groups và load balancers
-- Multi-region deployment cho high availability
-
-**Containerization:**
-- Docker containers cho tất cả services
-- Kubernetes orchestration
-- Helm charts cho deployment
-- CI/CD pipelines với GitLab/GitHub Actions
-
-**Monitoring và observability:**
-- Prometheus và Grafana cho metrics
-- ELK stack cho centralized logging
-- Distributed tracing với Jaeger
-- Alert system với PagerDuty/Slack
-
-**Security và compliance:**
-- Data encryption at rest và in transit
-- GDPR và PDPA compliance
-- Role-based access control
-- Security audits và penetration testing
-
-#### 3.2.5. Business development
-
-**B2B solutions:**
-- Premium APIs cho doanh nghiệp
-- Custom analytics dashboards
-- White-label solutions
-- Integration với HR systems (SAP, Workday)
-
-**Partnerships:**
-- Đại học và trường đào tạo
-- Career counseling services
-- Recruitment agencies
-- Government employment services
-
-**Monetization strategies:**
-- Subscription-based model
-- Premium reports và insights
-- Job posting platform
-- Advertising và sponsored content
-
-**International expansion:**
-- Multi-language support (English, Chinese, etc.)
-- Regional job markets
-- Cross-border job matching
-- Global company database
-
-### 3.3. Kết luận
-
-Hệ thống Smart Job Market Intelligence System đã được triển khai thành công với kiến trúc Big Data hoàn chỉnh, tích hợp các công nghệ tiên tiến như Hadoop, Spark, Elasticsearch và Kibana. Dự án không chỉ đáp ứng được yêu cầu bài tập lớn mà còn tạo ra một nền tảng phân tích thị trường lao động có giá trị thực tiễn.
-
-**Thành tựu đạt được:**
-
-- **Thu thập dữ liệu:** 2,000+ jobs từ TopCV với pipeline automated
-- **Security Monitoring:** Real-time threat detection với 99% accuracy
-- **Kafka Streaming:** 3-node cluster xử lý 10,000+ messages/second
-- **API Gateway:** FastAPI với JWT auth, rate limiting, multi-tenancy
-- **Xử lý dữ liệu:** Spark processing với ML models (accuracy 85%+)
-- **Alert System:** Automated alerts với email/Slack integration
-- **Lưu trữ:** HDFS + Elasticsearch cluster với 3 nodes
-- **Multi-tenancy:** Isolated environments cho 10+ tenants
-- **Trực quan hóa:** Kibana dashboards với 50+ visualizations
-- **API:** RESTful APIs với 15+ endpoints
-- **Triển khai:** Hướng dẫn cài đặt hoàn chỉnh cho production
-
-**Tầm nhìn tương lai:**
-
-Hệ thống Smart Job Market Intelligence System đã được triển khai thành công với kiến trúc Big Data hoàn chỉnh, tích hợp các công nghệ tiên tiến như Hadoop, Spark, Elasticsearch, Kibana, Kafka và FastAPI. Dự án không chỉ đáp ứng được yêu cầu bài tập lớn mà còn tạo ra một nền tảng phân tích thị trường lao động và security monitoring có giá trị thực tiễn cao.
-
-**Đặc biệt nổi bật:**
-
-**Security Monitoring Platform:**
-- Real-time threat detection với machine learning
-- Multi-tenant architecture phục vụ nhiều doanh nghiệp
-- Automated alert system với multi-channel notifications
-- API Gateway với authentication và rate limiting
-- Kafka streaming cho high-throughput data processing
-
-**Big Data Analytics:**
-- End-to-end data pipeline từ ingestion đến visualization
-- Machine learning models với high accuracy
-- Real-time streaming analytics với Spark Structured Streaming
-- Scalable architecture với 3-node cluster
-- RESTful APIs cho external integrations
-
-**Tầm nhìn tương lai mở rộng:**
-
-Hệ thống hướng tới trở thành nền tảng phân tích thị trường lao động và security monitoring hàng đầu Việt Nam, với khả năng mở rộng sang Đông Nam Á. Các hướng phát triển chính bao gồm:
-
-1. **Security Operations Center (SOC):** Nâng cấp thành SOC platform với SIEM capabilities
-2. **Cloud Migration:** Triển khai trên AWS/GCP/Azure với auto-scaling
-3. **AI/ML Enhancement:** Tích hợp deep learning cho threat detection nâng cao
-4. **Industry Solutions:** Specialized solutions cho finance, healthcare, e-commerce
-5. **Global Expansion:** Multi-language support và international job markets
-
-Với việc áp dụng các công nghệ mới như AI/ML, cloud computing, real-time analytics và security monitoring, hệ thống sẽ tiếp tục phát triển để đáp ứng nhu cầu ngày càng cao của thị trường lao động và an ninh mạng số hóa.
-
-**Hình 3.1: Roadmap phát triển hệ thống (2026-2030)**
-
-```
 2026 ──────────────────────────────────────────────────────────────────────────
 │ Q1 │ Q2 │ Q3 │ Q4 │ Cloud Migration & Auto-scaling Implementation           │
 │ AI │ ML │ DL │ NN │ Deep Learning Integration for Advanced Analytics        │
@@ -1310,33 +1220,7 @@ Với việc áp dụng các công nghệ mới như AI/ML, cloud computing, rea
 │ Quantum │ Edge Computing │ 6G Networks │ Metaverse │ AGI Integration        │
 │ Computing│ & IoT Scale   │ & Real-time │ Security  │ & Advanced ML          │
 └──────────┴───────────────┴─────────────┴───────────┴────────────────────────┘
-```
 
-**Bảng 3.1: KPI mục tiêu phát triển hệ thống**
-
-| Year | Users | Tenants | Data Volume | Accuracy | Availability | Response Time |
-|------|-------|---------|-------------|----------|--------------|---------------|
-| **2025** | 10,000 | 8 | 50TB | 87% | 99.9% | 45ms |
-| **2026** | 50,000 | 25 | 200TB | 92% | 99.95% | 25ms |
-| **2027** | 200,000 | 100 | 1PB | 94% | 99.99% | 15ms |
-| **2028** | 1M | 500 | 5PB | 96% | 99.999% | 10ms |
-| **2029** | 5M | 2,000 | 20PB | 97% | 99.9999% | 5ms |
-| **2030** | 25M | 10,000 | 100PB | 98% | 99.99999% | < 5ms |
-
-**Bảng 3.2: Investment và ROI Projection**
-
-| Investment Area | 2026 Budget | 2027 Budget | 2028 Budget | Projected ROI |
-|----------------|-------------|-------------|-------------|---------------|
-| **Cloud Infrastructure** | $500K | $1.2M | $2.5M | 300% (3 năm) |
-| **AI/ML R&D** | $300K | $800K | $1.8M | 450% (2 năm) |
-| **Security Enhancement** | $200K | $500K | $1.2M | 600% (18 tháng) |
-| **Global Expansion** | $150K | $400K | $1.5M | 250% (3 năm) |
-| **Team & Training** | $100K | $250K | $600K | 400% (2 năm) |
-| **Total Investment** | **$1.25M** | **$3.15M** | **$7.6M** | **380% average** |
-
-**Hình 3.2: Ecosystem mở rộng của hệ thống**
-
-```
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           SMART JOB MARKET ECOSYSTEM                      │
 ├─────────────────────────────────────────────────────────────────────────┘
@@ -1376,64 +1260,7 @@ Với việc áp dụng các công nghệ mới như AI/ML, cloud computing, rea
 │  │ • Notifications │    │ • Analytics UI   │    │ • 24/7 Support  │           │
 │  └─────────────────┘    └─────────────────┘    └─────────────────┘           │
 └──────────────────────────────────────────────────────────────────────────────┘
-```
 
----
-
-## PHỤ LỤC: THÀNH VIÊN NHÓM
-
-**GVHD:** TS. Võ Đức Quang
-
-**SVTH:**
-- Nguyễn Văn Chương, 225748010110032 (NT)
-- Phạm Quang Chiến, 225748010110042
-- Nguyễn Thế Công, 225748010110037
-- Nguyễn Quang Ánh, 225748010110021
-- Phạm Duy Thái, 225748010110037
-- Nguyễn Khắc Quân, 225748010110037
-
-**Ngày hoàn thành:** 01/2026
-
----
-
-## PHỤ LỤC A: KẾT QUẢ THỰC NGHIỆM
-
-### A.1. Kết quả thu thập dữ liệu
-
-**Thời gian thu thập:** 7 ngày (01/12/2024 - 07/12/2024)
-
-#### Job Market Data Collection
-| Nguồn dữ liệu | Số lượng bản tin | Tỷ lệ thành công | Thời gian trung bình |
-|---------------|------------------|------------------|----------------------|
-| **TopCV** | 2,456 | 94.2% | 2.3 giây/bản tin |
-| **VietnamWorks** | 1,823 | 87.8% | 3.1 giây/bản tin |
-| **Vieclam24h** | 1,567 | 91.5% | 2.8 giây/bản tin |
-| **Tổng cộng** | **5,846** | **91.2%** | **2.7 giây/bản tin** |
-
-#### Security Events Collection
-| Event Type | Số lượng events | Detection Rate | Processing Time |
-|------------|-----------------|----------------|-----------------|
-| **SQL Injection** | 234 | 98.5% | 25ms |
-| **XSS Attacks** | 187 | 96.8% | 18ms |
-| **Brute Force** | 456 | 99.2% | 12ms |
-| **Suspicious Traffic** | 1,203 | 95.1% | 8ms |
-| **Total Security Events** | **2,080** | **97.4%** | **16ms** |
-
-#### API Gateway Metrics
-| Metric | Daily Average | Peak Value | Trend |
-|--------|----------------|------------|-------|
-| **API Calls** | 45,230 | 67,890 | +15%/day |
-| **Active Tenants** | 8 | 12 | +25%/week |
-| **Data Processed** | 2.3 GB | 4.1 GB | +18%/day |
-| **Kafka Messages** | 156,780 | 234,560 | +22%/day |
-
-### A.2. Hiệu suất hệ thống
-
-#### A.2.1. Hiệu suất Kafka Cluster
-
-**Hình A.1: Kafka Cluster Performance Metrics**
-
-```
 Performance Dashboard - Kafka Cluster (3 Nodes)
 ═══════════════════════════════════════════════════════════════
 
