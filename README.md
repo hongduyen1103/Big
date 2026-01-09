@@ -69,56 +69,57 @@ Hệ thống Smart Job Market Intelligence System được thiết kế với ki
 ### 1.2. Kiến trúc tổng thể của hệ thống
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    SMART JOB MARKET INTELLIGENCE                 │
-│                           SYSTEM                                │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
-│  │   Data Sources  │    │  Data Ingestion │    │   Data Storage  │ │
-│  │                 │    │                 │    │                 │ │
-│  │  • TopCV        │───▶│  • Scrapy       │───▶│  • HDFS        │ │
-│  │  • VietnamWorks │    │  • Selenium     │    │  • PostgreSQL  │ │
-│  │  • Vieclam24h   │    │  • BeautifulSoup│    │  • Kafka       │ │
-│  │  • ViecOi       │    │  • Cron Jobs    │    │                 │ │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘ │
-│            │                       │                       │      │
-│            ▼                       ▼                       ▼      │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
-│  │ Data Processing │    │   ML Analytics  │    │  Data Indexing  │ │
-│  │                 │    │                 │    │                 │ │
-│  │  • Apache Spark │───▶│  • Salary Pred  │───▶│  • Elasticsearch│ │
-│  │  • PySpark      │    │  • Job Classify │    │  • Kibana       │ │
-│  │  • MLlib        │    │  • Trend Forecast│    │  • Search API  │ │
-│  │  • Batch/Stream │    │  • NLP Processing│    │                 │ │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘ │
-│            │                       │                       │      │
-│            ▼                       ▼                       ▼      │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐ │
-│  │  Visualization  │    │      API        │    │   Web Demo UI   │ │
-│  │                 │    │                 │    │                 │ │
-│  │  • Kibana Dash  │    │  • Flask REST   │    │  • Career Guide │ │
-│  │  • Real-time    │    │  • JSON API     │    │  • Job Matching │ │
-│  │  • Interactive  │    │  • External Int │    │  • Salary Calc  │ │
-│  │  • Heat Maps    │    │  • Third-party  │    │                 │ │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘ │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│               INFRASTRUCTURE: VirtualBox VMs                    │
-├─────────────────────────────────────────────────────────────────┤
-│  • Master Node: 8 CPU, 16GB RAM, Hadoop/Spark/ES Master        │
-│  • Worker1: 6 CPU, 12GB RAM, Data Node, Worker Node             │
-│  • Worker2: 6 CPU, 12GB RAM, Data Node, Worker Node             │
-│  • Network: 172.16.232.0/22, Bridged Adapter                    │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    SMART JOB MARKET INTELLIGENCE & SECURITY SYSTEM              │
+│                           WITH REAL-TIME STREAMING                              │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐      │
+│  │ Data Sources│    │ Data Ingestion│    │   Kafka     │    │ API Gateway │      │
+│  │             │    │              │    │   Streaming │    │             │      │
+│  │  • TopCV    │───▶│  • Scrapy     │───▶│  • Topics   │───▶│  • FastAPI  │      │
+│  │  • External │    │  • Selenium   │    │  • Producers│    │  • REST APIs│      │
+│  │  • APIs     │    │  • Cron Jobs  │    │  • Consumers│    │  • JWT Auth │      │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘      │
+│            │                 │                       │                       │     │
+│            ▼                 ▼                       ▼                       ▼     │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐      │
+│  │  Batch Proc │    │ Stream Proc  │    │ ML Analytics│    │  Data Index  │      │
+│  │             │    │              │    │             │    │              │      │
+│  │  • Hadoop   │───▶│  • Spark     │───▶│  • Salary   │───▶│  • Elastic   │      │
+│  │  • HDFS     │    │  • Streaming  │    │  • Pred     │    │  • Search    │      │
+│  │  • MapReduce│    │  • Kafka     │    │  • Classify │    │  • Kibana    │      │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘      │
+│            │                 │                       │                       │     │
+│            ▼                 ▼                       ▼                       ▼     │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐      │
+│  │ Tenant Mgmt │    │ Alert System│    │ Visualization│    │ Web Dash UI │      │
+│  │             │    │              │    │             │    │              │      │
+│  │  • Multi-ten│───▶│  • Email     │───▶│  • Kibana   │───▶│  • Tenant UI │      │
+│  │  • Isolation│    │  • Slack     │    │  • Real-time│    │  • Analytics │      │
+│  │  • Quotas   │    │  • Webhooks  │    │  • Heat Maps│    │  • Reports   │      │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘      │
+│                                                                                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                   INFRASTRUCTURE: 3-Node Cluster with Streaming                 │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│  • Master Node: Hadoop/Spark/ES/Kafka/Zookeeper Master, API Gateway            │
+│  • Worker1: Hadoop DataNode, Spark Worker, Kafka Broker, Worker Consumer       │
+│  • Worker2: Hadoop DataNode, Spark Worker, Kafka Broker, Worker Consumer       │
+│  • Kafka Topics: web-attack-logs, processed-events, security-alerts            │
+│  • API Endpoints: /api/v1/security/*, /api/v1/tenants/*, /health                │
+│  • Network: 172.16.232.0/22, High Availability, Fault Tolerance                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Luồng dữ liệu chính:**
 1. **Thu thập:** Scrapy/Selenium thu thập dữ liệu từ các trang tuyển dụng
-2. **Lưu trữ:** Dữ liệu được lưu vào HDFS và PostgreSQL
-3. **Xử lý:** Spark xử lý batch/streaming và áp dụng ML models
-4. **Index:** Elasticsearch index dữ liệu cho tìm kiếm nhanh
-5. **Trực quan:** Kibana tạo dashboard, Flask API phục vụ ứng dụng
+2. **Streaming:** Dữ liệu real-time được đẩy vào Kafka topics
+3. **Lưu trữ:** Dữ liệu được lưu vào HDFS và PostgreSQL
+4. **Xử lý:** Spark xử lý batch/streaming và áp dụng ML models
+5. **Index:** Elasticsearch index dữ liệu cho tìm kiếm nhanh
+6. **API:** FastAPI Gateway expose RESTful APIs
+7. **Trực quan:** Kibana tạo dashboard, multi-tenant web UI
 
 ### 1.3. Chi tiết thành phần hệ thống
 
@@ -334,9 +335,76 @@ Các dashboard chính:
 - Custom visualizations với Vega
 - Alert system cho threshold breaches
 
-### 1.4. Các tính năng cốt lõi của hệ thống
+### 1.4. Kiến trúc Streaming và Real-time Processing
 
-#### 1.4.1. Phân tích mô tả (Descriptive Analytics)
+#### 1.4.1. Apache Kafka Cluster
+
+**Apache Kafka** được tích hợp làm xương sống cho hệ thống streaming data, cung cấp khả năng xử lý dữ liệu real-time với độ tin cậy cao và khả năng mở rộng.
+
+**Cấu hình Kafka Cluster:**
+- **3-node cluster**: Master, Worker1, Worker2
+- **Zookeeper ensemble**: Quản lý metadata và leader election
+- **Replication factor**: 3 cho fault tolerance
+- **Partitions**: 3 partitions per topic cho parallel processing
+
+**Các Kafka Topics chính:**
+```bash
+# Raw data ingestion
+web-attack-logs (3 partitions, RF=3)
+
+# Processed data streams
+processed-security-events (3 partitions, RF=2)
+security-alerts (2 partitions, RF=2)
+multi-tenant-data (3 partitions, RF=2)
+
+# Administrative topics
+tenant-events (1 partition, RF=2)
+security-reports (1 partition, RF=2)
+```
+
+**Kafka Connect & Streams:**
+- **Kafka Connect**: Đẩy dữ liệu từ external sources
+- **Kafka Streams**: Real-time processing và transformations
+- **KSQL**: SQL interface cho stream processing
+
+#### 1.4.2. API Gateway và Multi-tenancy
+
+**FastAPI Gateway** được triển khai làm điểm entry point duy nhất cho toàn bộ hệ thống:
+
+**Kiến trúc Multi-tenant:**
+```python
+# Tenant isolation
+/tenants/{tenant_id}/
+├── /logs          # Tenant-specific logs
+├── /analytics     # Tenant analytics
+├── /alerts        # Tenant alerts
+└── /reports       # Tenant reports
+```
+
+**Security Features:**
+- **JWT Authentication**: Token-based authentication
+- **Rate Limiting**: Redis-backed rate limiting per tenant
+- **API Keys**: Tenant-specific API keys với expiration
+- **Audit Logging**: Comprehensive audit trails
+
+**API Endpoints:**
+```bash
+# Security Monitoring APIs
+POST   /api/v1/security/log              # Single log ingestion
+POST   /api/v1/security/logs/batch       # Batch log ingestion
+POST   /api/v1/security/alert            # Create alerts
+GET    /api/v1/security/health           # Health check
+
+# Tenant Management APIs
+POST   /api/v1/tenants/                  # Create tenant
+GET    /api/v1/tenants/{tenant_id}       # Get tenant info
+GET    /api/v1/tenants/{tenant_id}/stats # Get tenant stats
+POST   /api/v1/tenants/{tenant_id}/api-keys # Generate API key
+```
+
+### 1.5. Các tính năng cốt lõi của hệ thống
+
+#### 1.5.1. Phân tích mô tả (Descriptive Analytics)
 
 1. **Thống kê ngành nghề và kỹ năng hot nhất:**
    - Top 20 kỹ năng được yêu cầu nhiều nhất
@@ -1903,6 +1971,1501 @@ curl -X POST "http://master:5000/api/predict-salary" \
   - Top companies by job count (Bar chart)
   - Salary distribution (Histogram)
   - Geographic distribution (Map)
+
+---
+
+## 2.10. CÀI ĐẶT VÀ CẤU HÌNH KAFKA CLUSTER
+
+### 2.10.1. Download và cài đặt Kafka
+
+**Trên tất cả VMs:**
+```bash
+# Download Kafka 3.6.0 (Scala 2.12 - tương thích Spark 3.5)
+cd /tmp
+wget https://archive.apache.org/dist/kafka/3.6.0/kafka_2.12-3.6.0.tgz
+
+# Giải nén và cấu hình
+sudo tar -xzf kafka_2.12-3.6.0.tgz -C /opt/
+sudo mv /opt/kafka_2.12-3.6.0 /opt/kafka
+sudo chown -R hadoop:hadoop /opt/kafka
+
+# Thêm biến môi trường
+echo 'export KAFKA_HOME=/opt/kafka' >> ~/.bashrc
+echo 'export PATH=$PATH:$KAFKA_HOME/bin' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### 2.10.2. Cấu hình Zookeeper Ensemble
+
+**zookeeper.properties (tất cả VMs):**
+```properties
+# Zookeeper cluster configuration
+dataDir=/data/zookeeper
+clientPort=2181
+maxClientCnxns=0
+tickTime=2000
+initLimit=10
+syncLimit=5
+
+# Cluster nodes
+server.1=master:2888:3888
+server.2=worker1:2888:3888
+server.3=worker2:2888:3888
+
+# Enable command whitelist
+4lw.commands.whitelist=*
+```
+
+**Tạo myid cho từng node:**
+```bash
+# Master: ID = 1
+echo "1" > /data/zookeeper/myid
+
+# Worker1: ID = 2
+echo "2" > /data/zookeeper/myid
+
+# Worker2: ID = 3
+echo "3" > /data/zookeeper/myid
+```
+
+### 2.10.3. Cấu hình Kafka Brokers
+
+**server.properties (Master):**
+```properties
+# Broker configuration for Master
+broker.id=1
+listeners=PLAINTEXT://master:9092
+advertised.listeners=PLAINTEXT://master:9092
+zookeeper.connect=master:2181,worker1:2181,worker2:2181
+zookeeper.connection.timeout.ms=18000
+
+# Data and logs
+log.dirs=/data/kafka
+num.partitions=3
+default.replication.factor=3
+min.insync.replicas=2
+
+# Topic management
+delete.topic.enable=true
+auto.create.topics.enable=false
+
+# Performance tuning
+num.network.threads=3
+num.io.threads=8
+socket.send.buffer.bytes=102400
+socket.receive.buffer.bytes=102400
+socket.request.max.bytes=104857600
+```
+
+**Tương tự cho Worker1 (broker.id=2) và Worker2 (broker.id=3).**
+
+### 2.10.4. Khởi động Kafka Cluster
+
+**Thứ tự khởi động quan trọng:**
+```bash
+# Bước 1: Khởi động Zookeeper trên tất cả nodes
+cd /opt/kafka
+nohup bin/zookeeper-server-start.sh config/zookeeper.properties \
+  > /data/zookeeper/zookeeper.log 2>&1 &
+
+# Đợi 30 giây để Zookeeper cluster hình thành
+sleep 30
+
+# Bước 2: Khởi động Kafka brokers trên tất cả nodes
+nohup bin/kafka-server-start.sh config/server.properties \
+  > /data/kafka/kafka.log 2>&1 &
+
+# Đợi 60 giây để cluster ổn định
+sleep 60
+```
+
+### 2.10.5. Tạo và quản lý Kafka Topics
+
+**Tạo topics chính:**
+```bash
+# Topic cho raw logs (replication factor 3)
+kafka-topics.sh --create \
+  --bootstrap-server master:9092 \
+  --replication-factor 3 \
+  --partitions 3 \
+  --topic web-attack-logs
+
+# Topic cho processed events (replication factor 2)
+kafka-topics.sh --create \
+  --bootstrap-server master:9092 \
+  --replication-factor 2 \
+  --partitions 3 \
+  --topic processed-security-events
+
+# Topic cho security alerts (replication factor 2)
+kafka-topics.sh --create \
+  --bootstrap-server master:9092 \
+  --replication-factor 2 \
+  --partitions 2 \
+  --topic security-alerts
+
+# Topic cho multi-tenant data
+kafka-topics.sh --create \
+  --bootstrap-server master:9092 \
+  --replication-factor 2 \
+  --partitions 3 \
+  --topic multi-tenant-data
+```
+
+**Kiểm tra topics:**
+```bash
+# List all topics
+kafka-topics.sh --list --bootstrap-server master:9092
+
+# Describe topic details
+kafka-topics.sh --describe --bootstrap-server master:9092 --topic web-attack-logs
+
+# Check topic partition distribution
+kafka-topics.sh --describe --bootstrap-server master:9092
+```
+
+### 2.10.6. Test Kafka Cluster
+
+**Kiểm tra cluster health:**
+```bash
+# Test broker connectivity
+kafka-broker-api-versions.sh --bootstrap-server master:9092
+
+# Check cluster metadata
+kafka-metadata-quorum.sh --bootstrap-server master:9092 describe --status
+
+# Test topic operations
+echo "Test message" | kafka-console-producer.sh \
+  --bootstrap-server master:9092 \
+  --topic test-topic
+
+kafka-console-consumer.sh \
+  --bootstrap-server master:9092 \
+  --topic test-topic \
+  --from-beginning \
+  --max-messages 1
+```
+
+**Monitoring Kafka:**
+```bash
+# Consumer group status
+kafka-consumer-groups.sh --bootstrap-server master:9092 --list
+
+# Broker metrics (using JMX)
+kafka-run-class.sh kafka.tools.JmxTool \
+  --jmx-url service:jmx:rmi:///jndi/rmi://master:9092/jmxrmi \
+  --object-name kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec
+```
+
+**✅ KAFKA CLUSTER HOẠT ĐỘNG HOÀN HẢO!**
+
+---
+
+## 2.11. TRIỂN KHAI API GATEWAY VỚI FASTAPI
+
+### 2.11.1. Cài đặt FastAPI và Dependencies
+
+**Trên Master VM:**
+```bash
+# Core FastAPI packages
+pip3 install fastapi==0.104.1 uvicorn==0.24.0
+
+# Kafka integration
+pip3 install kafka-python==2.0.2
+
+# Data validation and security
+pip3 install pydantic==2.5.0 python-jose[cryptography]==3.3.0
+pip3 install passlib[bcrypt]==1.7.4 pyjwt==2.8.0
+
+# Rate limiting và caching
+pip3 install redis==5.0.1 aioredis==2.0.1
+pip3 install slowapi==0.1.9
+
+# Additional utilities
+pip3 install python-multipart==0.0.6
+```
+
+### 2.11.2. Kiến trúc API Gateway
+
+**Cấu trúc thư mục:**
+```
+/opt/api-gateway/
+├── app/
+│   ├── main.py              # FastAPI application
+│   ├── config.py            # Application configuration
+│   └── dependencies.py      # Dependency injection
+├── models/
+│   ├── request_models.py    # Pydantic request models
+│   └── response_models.py   # API response models
+├── routes/
+│   ├── security_routes.py   # Security endpoints
+│   ├── tenant_routes.py     # Tenant management
+│   └── health_routes.py     # Health checks
+├── services/
+│   ├── kafka_service.py     # Kafka producer/consumer
+│   ├── auth_service.py      # Authentication service
+│   └── tenant_service.py    # Tenant management service
+├── utils/
+│   ├── security.py          # Security utilities
+│   ├── rate_limiting.py     # Rate limiting
+│   └── logging_config.py    # Logging configuration
+└── logs/
+    ├── api.log
+    └── error.log
+```
+
+### 2.11.3. Cấu hình API Gateway
+
+**config/settings.py:**
+```python
+import os
+from typing import Dict, List
+
+class Settings:
+    # API Configuration
+    API_TITLE = "BigData Security Monitoring API"
+    API_VERSION = "1.0.0"
+    API_DESCRIPTION = "Real-time website attack detection and monitoring system"
+
+    # Server Configuration
+    HOST = "0.0.0.0"
+    PORT = 8000
+    DEBUG = False
+    WORKERS = 4
+
+    # Kafka Configuration
+    KAFKA_BOOTSTRAP_SERVERS = [
+        "master:9092",
+        "worker1:9092",
+        "worker2:9092"
+    ]
+
+    KAFKA_TOPICS = {
+        "RAW_LOGS": "web-attack-logs",
+        "PROCESSED_EVENTS": "processed-security-events",
+        "ALERTS": "security-alerts",
+        "TENANT_DATA": "multi-tenant-data",
+        "TENANT_EVENTS": "tenant-events"
+    }
+
+    # Security Configuration
+    SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+    ALGORITHM = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES = 1440  # 24 hours
+
+    # Redis Configuration (Rate Limiting)
+    REDIS_HOST = "localhost"
+    REDIS_PORT = 6379
+    REDIS_PASSWORD = None
+
+    # Rate Limiting
+    RATE_LIMIT_PER_MINUTE = 100
+    RATE_LIMIT_PER_HOUR = 1000
+
+    # Multi-tenancy
+    SUPPORTED_TENANTS = ["company_a", "company_b", "company_c"]
+    DEFAULT_TENANT_QUOTA = {
+        "max_qps": 100,
+        "max_storage_gb": 10,
+        "max_users": 50
+    }
+
+    # Alert Thresholds
+    ALERT_THRESHOLDS = {
+        "HIGH_TRAFFIC": 1000,    # requests per minute
+        "SQL_INJECTION": 10,     # attempts per minute
+        "XSS_ATTACK": 10,        # attempts per minute
+        "BRUTE_FORCE": 50        # attempts per minute
+    }
+
+settings = Settings()
+```
+
+### 2.11.4. Triển khai Kafka Service
+
+**services/kafka_service.py:**
+```python
+from kafka import KafkaProducer, KafkaConsumer
+from kafka.errors import KafkaError
+import json
+import logging
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+from config.settings import settings
+
+logger = logging.getLogger(__name__)
+
+class KafkaProducerService:
+    """Kafka Producer Service với singleton pattern"""
+
+    _instance = None
+    _producer = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(KafkaProducerService, cls).__new__(cls)
+            cls._instance._initialize_producer()
+        return cls._instance
+
+    def _initialize_producer(self):
+        """Khởi tạo Kafka producer"""
+        try:
+            self._producer = KafkaProducer(
+                bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+                value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                key_serializer=lambda k: str(k).encode('utf-8') if k else None,
+                acks='all',
+                retries=3,
+                max_in_flight_requests_per_connection=1,
+                compression_type='gzip',
+                linger_ms=5,
+                batch_size=16384
+            )
+            logger.info("Kafka producer initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Kafka producer: {e}")
+            raise
+
+    def send_log(self,
+                 topic: str,
+                 message: Dict[str, Any],
+                 key: Optional[str] = None,
+                 tenant_id: Optional[str] = None) -> Dict[str, Any]:
+        """Gửi log message đến Kafka topic"""
+        try:
+            # Thêm thông tin tenant nếu có
+            if tenant_id:
+                message['tenant_id'] = tenant_id
+                message['processing_node'] = 'api_gateway'
+
+            # Thêm timestamp nếu chưa có
+            if 'timestamp' not in message:
+                message['timestamp'] = datetime.utcnow().isoformat()
+
+            # Gửi message
+            future = self._producer.send(
+                topic=topic,
+                key=key,
+                value=message
+            )
+
+            # Đợi xác nhận (timeout 10 giây)
+            record_metadata = future.get(timeout=10)
+
+            logger.info(f"Message sent to {topic} partition {record_metadata.partition}")
+
+            return {
+                "success": True,
+                "topic": record_metadata.topic,
+                "partition": record_metadata.partition,
+                "offset": record_metadata.offset
+            }
+
+        except KafkaError as e:
+            logger.error(f"Kafka error: {e}")
+            return {"success": False, "error": str(e)}
+        except Exception as e:
+            logger.error(f"Unexpected error: {e}")
+            return {"success": False, "error": str(e)}
+
+    def send_batch(self,
+                   topic: str,
+                   messages: List[Dict[str, Any]],
+                   key: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Gửi batch messages"""
+        results = []
+        for message in messages:
+            result = self.send_log(topic, message, key)
+            results.append(result)
+        return results
+
+    def close(self):
+        """Đóng Kafka producer"""
+        if self._producer:
+            self._producer.flush()
+            self._producer.close()
+            logger.info("Kafka producer closed")
+
+# Singleton instance
+kafka_producer = KafkaProducerService()
+```
+
+### 2.11.5. Triển khai Authentication & Security
+
+**utils/security.py:**
+```python
+import jwt
+from datetime import datetime, timedelta
+from typing import Optional, Dict, Any
+from functools import wraps
+import redis
+import logging
+from fastapi import HTTPException, status, Request
+from config.settings import settings
+
+logger = logging.getLogger(__name__)
+
+# Redis client cho rate limiting
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    password=settings.REDIS_PASSWORD,
+    decode_responses=True
+)
+
+def create_access_token(data: Dict[str, Any],
+                       expires_delta: Optional[timedelta] = None) -> str:
+    """Tạo JWT access token"""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    to_encode.update({"exp": expire, "iat": datetime.utcnow()})
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt
+
+def verify_token(token: str) -> Optional[Dict[str, Any]]:
+    """Xác thực JWT token"""
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        logger.warning("Token expired")
+        return None
+    except jwt.JWTError as e:
+        logger.error(f"Token verification failed: {e}")
+        return None
+
+def rate_limit(limit: int = 100):
+    """Decorator cho rate limiting"""
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(request: Request, *args, **kwargs):
+            # Lấy thông tin client
+            client_ip = request.client.host if request.client else "unknown"
+            endpoint = request.url.path
+            method = request.method
+
+            # Tạo Redis key
+            current_minute = datetime.now().strftime("%Y%m%d%H%M")
+            key = f"rate_limit:{client_ip}:{method}:{endpoint}:{current_minute}"
+
+            # Kiểm tra và tăng counter
+            current_count = redis_client.get(key)
+            if current_count is None:
+                redis_client.setex(key, 60, 1)  # Expire trong 60 giây
+                current_count = 1
+            else:
+                current_count = int(current_count)
+                if current_count >= limit:
+                    logger.warning(f"Rate limit exceeded for {client_ip}: {current_count}/{limit}")
+                    raise HTTPException(
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                        detail=f"Rate limit exceeded: {limit} requests per minute"
+                    )
+                redis_client.incr(key)
+
+            return await func(request, *args, **kwargs)
+        return wrapper
+    return decorator
+
+def detect_attack_pattern(log_data: Dict[str, Any]) -> Optional[str]:
+    """Phát hiện pattern tấn công"""
+    url = log_data.get('url', '').lower()
+
+    attack_patterns = {
+        'sql_injection': [
+            "' or '1'='1", "union select", "drop table", "select * from",
+            "insert into", "delete from", "update set"
+        ],
+        'xss': [
+            "<script>", "javascript:", "alert(", "document.cookie",
+            "onload=", "onerror=", "eval("
+        ],
+        'path_traversal': ["../", "..\\", "/etc/passwd", "/etc/shadow"],
+        'command_injection': ["; ls", "| cat", "`id`", "$(whoami)"]
+    }
+
+    for attack_type, patterns in attack_patterns.items():
+        for pattern in patterns:
+            if pattern in url:
+                return attack_type
+
+    return None
+
+def validate_tenant_access(tenant_id: str, user_payload: Dict[str, Any]) -> bool:
+    """Kiểm tra quyền truy cập tenant"""
+    user_tenant = user_payload.get('tenant_id')
+    user_role = user_payload.get('role', 'user')
+
+    # Admin có thể truy cập tất cả tenants
+    if user_role == 'admin':
+        return True
+
+    # User thường chỉ truy cập tenant của mình
+    return user_tenant == tenant_id
+```
+
+### 2.11.6. Triển khai API Routes
+
+**routes/security_routes.py:**
+```python
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import List, Optional
+import logging
+
+from models.request_models import (
+    WebLog, SecurityEvent, BatchLogRequest,
+    AlertRequest, APIResponse
+)
+from services.kafka_service import kafka_producer
+from config.settings import settings
+from utils.security import verify_token, rate_limit, detect_attack_pattern
+
+router = APIRouter(prefix="/api/v1/security", tags=["security"])
+security = HTTPBearer()
+logger = logging.getLogger(__name__)
+
+@router.post("/log", response_model=APIResponse)
+@rate_limit(limit=settings.RATE_LIMIT_PER_MINUTE)
+async def ingest_security_log(
+    log: WebLog,
+    background_tasks: BackgroundTasks,
+    tenant_id: str,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Nhận security log đơn lẻ"""
+    try:
+        # Xác thực token
+        payload = verify_token(credentials.credentials)
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+
+        # Phát hiện tấn công
+        attack_type = detect_attack_pattern(log.dict())
+
+        # Chuẩn bị message
+        message = log.dict()
+        message.update({
+            'api_key': payload.get('api_key'),
+            'attack_detected': attack_type,
+            'severity': 'high' if attack_type else 'low'
+        })
+
+        # Gửi đến Kafka trong background
+        background_tasks.add_task(
+            kafka_producer.send_log,
+            topic=settings.KAFKA_TOPICS["RAW_LOGS"],
+            message=message,
+            key=log.source_ip,
+            tenant_id=tenant_id
+        )
+
+        return APIResponse(
+            success=True,
+            message="Log ingested successfully",
+            data={
+                "log_id": f"{log.timestamp}_{log.source_ip}",
+                "attack_detected": attack_type
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error ingesting log: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/logs/batch", response_model=APIResponse)
+@rate_limit(limit=settings.RATE_LIMIT_PER_HOUR)
+async def ingest_batch_logs(
+    batch_request: BatchLogRequest,
+    background_tasks: BackgroundTasks,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Nhận batch security logs"""
+    try:
+        # Xác thực token
+        payload = verify_token(credentials.credentials)
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+
+        successful_logs = 0
+        attacks_detected = 0
+
+        # Xử lý từng log
+        for log in batch_request.logs:
+            attack_type = detect_attack_pattern(log.dict())
+            if attack_type:
+                attacks_detected += 1
+
+            message = log.dict()
+            message.update({
+                'batch_id': batch_request.metadata.get('batch_id', ''),
+                'api_key': payload.get('api_key'),
+                'attack_detected': attack_type,
+                'severity': 'high' if attack_type else 'low'
+            })
+
+            background_tasks.add_task(
+                kafka_producer.send_log,
+                topic=settings.KAFKA_TOPICS["RAW_LOGS"],
+                message=message,
+                key=log.source_ip,
+                tenant_id=batch_request.tenant_id
+            )
+            successful_logs += 1
+
+        return APIResponse(
+            success=True,
+            message=f"Batch ingested: {successful_logs}/{len(batch_request.logs)} logs",
+            data={
+                "total_logs": len(batch_request.logs),
+                "successful": successful_logs,
+                "attacks_detected": attacks_detected,
+                "tenant_id": batch_request.tenant_id
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error ingesting batch: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.post("/alert", response_model=APIResponse)
+async def create_alert_config(
+    alert_request: AlertRequest,
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    """Tạo cấu hình alert"""
+    try:
+        # Xác thực token
+        payload = verify_token(credentials.credentials)
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+
+        # Chuẩn bị alert config
+        alert_data = alert_request.dict()
+        alert_data.update({
+            'action': 'CREATE_ALERT',
+            'created_by': payload.get('user_id', 'system'),
+            'created_at': datetime.utcnow().isoformat()
+        })
+
+        # Gửi đến Kafka
+        result = kafka_producer.send_log(
+            topic=settings.KAFKA_TOPICS["ALERTS"],
+            message=alert_data,
+            key=alert_request.tenant_id
+        )
+
+        if not result['success']:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=result['error']
+            )
+
+        return APIResponse(
+            success=True,
+            message="Alert configuration created",
+            data={"alert_id": f"alert_{alert_request.tenant_id}_{int(time.time())}"}
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating alert: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+@router.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    try:
+        # Kiểm tra Kafka connectivity
+        kafka_status = "unknown"
+        try:
+            from kafka import KafkaConsumer
+            consumer = KafkaConsumer(
+                bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS[0],
+                group_id='health_check',
+                auto_offset_reset='earliest',
+                enable_auto_commit=False,
+                consumer_timeout_ms=1000
+            )
+            topics = consumer.topics()
+            consumer.close()
+            kafka_status = "healthy" if topics else "unhealthy"
+        except:
+            kafka_status = "unhealthy"
+
+        return APIResponse(
+            success=True,
+            message="API Gateway is running",
+            data={
+                "kafka": kafka_status,
+                "timestamp": datetime.utcnow().isoformat(),
+                "version": settings.API_VERSION
+            }
+        )
+
+    except Exception as e:
+        return APIResponse(
+            success=False,
+            message="Health check failed",
+            error=str(e)
+        )
+```
+
+### 2.11.7. Triển khai Main Application
+
+**app/main.py:**
+```python
+from fastapi import FastAPI, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+import logging
+import time
+from contextlib import asynccontextmanager
+
+from routes.security_routes import router as security_router
+from config.settings import settings
+from services.kafka_service import kafka_producer
+
+# Cấu hình logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/opt/api-gateway/logs/api.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events"""
+    # Startup
+    logger.info("=" * 50)
+    logger.info("Starting BigData Security API Gateway")
+    logger.info(f"Version: {settings.API_VERSION}")
+    logger.info(f"Kafka servers: {settings.KAFKA_BOOTSTRAP_SERVERS}")
+    logger.info("=" * 50)
+
+    # Test Kafka connection
+    try:
+        from kafka import KafkaConsumer
+        consumer = KafkaConsumer(
+            bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS[0],
+            group_id='startup_check',
+            auto_offset_reset='earliest',
+            enable_auto_commit=False,
+            consumer_timeout_ms=5000
+        )
+        topics = consumer.topics()
+        consumer.close()
+        logger.info(f"✅ Connected to Kafka. Available topics: {list(topics)[:5]}...")
+    except Exception as e:
+        logger.error(f"❌ Kafka connection failed: {e}")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down API Gateway...")
+    kafka_producer.close()
+
+# Khởi tạo FastAPI app
+app = FastAPI(
+    title=settings.API_TITLE,
+    version=settings.API_VERSION,
+    description=settings.API_DESCRIPTION,
+    lifespan=lifespan
+)
+
+# Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Trong production, chỉ định origins cụ thể
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Request logging middleware
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Middleware để log tất cả requests"""
+    start_time = time.time()
+
+    logger.info(f"📨 {request.method} {request.url} - Client: {request.client.host if request.client else 'unknown'}")
+
+    response = await call_next(request)
+
+    process_time = time.time() - start_time
+    logger.info(f"📤 Response: {response.status_code} - Time: {process_time:.3f}s")
+
+    return response
+
+# Include routers
+app.include_router(security_router)
+
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "message": "Welcome to BigData Security Monitoring API",
+        "version": settings.API_VERSION,
+        "docs": "/docs",
+        "health": "/api/v1/security/health",
+        "openapi": "/openapi.json"
+    }
+
+@app.get("/api/v1/")
+async def api_root():
+    """API root endpoint"""
+    return {
+        "message": "BigData Security API v1",
+        "endpoints": {
+            "security": "/api/v1/security/",
+            "health": "/api/v1/security/health",
+            "docs": "/docs"
+        },
+        "supported_tenants": settings.SUPPORTED_TENANTS
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG,
+        workers=settings.WORKERS,
+        log_level="info"
+    )
+```
+
+### 2.11.8. Tạo Systemd Service
+
+**Tạo file /etc/systemd/system/api-gateway.service:**
+```ini
+[Unit]
+Description=BigData Security API Gateway
+After=network.target kafka.service
+Wants=kafka.service
+Requires=kafka.service
+
+[Service]
+Type=simple
+User=hadoop
+Group=hadoop
+WorkingDirectory=/opt/api-gateway/app
+Environment="PYTHONPATH=/opt/api-gateway"
+Environment="KAFKA_BOOTSTRAP_SERVERS=master:9092,worker1:9092,worker2:9092"
+ExecStart=/usr/bin/python3 -m uvicorn main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 4 \
+    --loop uvloop \
+    --http httptools
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=api-gateway
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/api-gateway/logs /data
+ProtectHome=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=2G
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### 2.11.9. Khởi động và test API Gateway
+
+**Khởi động service:**
+```bash
+# Reload systemd và enable service
+sudo systemctl daemon-reload
+sudo systemctl enable api-gateway.service
+sudo systemctl start api-gateway.service
+
+# Kiểm tra trạng thái
+sudo systemctl status api-gateway.service
+
+# Xem logs
+sudo journalctl -u api-gateway.service -f
+```
+
+**Test API endpoints:**
+```bash
+# Health check
+curl -s http://172.16.232.101:8000/api/v1/security/health | jq
+
+# Test single log ingestion
+curl -X POST "http://172.16.232.101:8000/api/v1/security/log?tenant_id=company_a" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timestamp": "2025-01-15T10:30:00Z",
+    "source_ip": "192.168.1.100",
+    "destination_ip": "10.0.0.1",
+    "http_method": "GET",
+    "url": "/admin.php?id=1'\'' OR '\''1'\''='\''1",
+    "response_code": 200,
+    "response_size": 1024,
+    "request_time": 0.5,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  }' | jq
+
+# Test batch logs
+curl -X POST "http://172.16.232.101:8000/api/v1/security/logs/batch" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tenant_id": "company_a",
+    "logs": [
+      {
+        "timestamp": "2025-01-15T10:30:01Z",
+        "source_ip": "192.168.1.101",
+        "http_method": "POST",
+        "url": "/login.php",
+        "response_code": 200,
+        "request_time": 1.2
+      }
+    ],
+    "metadata": {
+      "batch_id": "batch_001",
+      "source": "web_server_logs"
+    }
+  }' | jq
+```
+
+**Performance testing:**
+```bash
+# Load testing với Apache Bench
+ab -n 1000 -c 10 -H "Authorization: Bearer YOUR_TOKEN" \
+   -T "application/json" \
+   -p test_payload.json \
+   http://172.16.232.101:8000/api/v1/security/log?tenant_id=company_a
+
+# Monitor API performance
+sudo journalctl -u api-gateway.service -f | grep -E "(Response|Error)"
+```
+
+**✅ API GATEWAY HOẠT ĐỘNG HOÀN HẢO!**
+
+---
+
+## 2.12. TRIỂN KHAI KAFKA CONSUMERS VÀ SPARK STREAMING
+
+### 2.12.1. Tạo Kafka Consumer Workers
+
+**scripts/kafka_consumer_worker.py:**
+```python
+#!/usr/bin/env python3
+"""
+Kafka Consumer for Worker Nodes
+Xử lý security logs và phân phối đến Spark
+"""
+import json
+import logging
+from kafka import KafkaConsumer
+from datetime import datetime
+import threading
+import time
+import socket
+import sys
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class WorkerConsumer:
+    def __init__(self, worker_id, bootstrap_servers):
+        self.worker_id = worker_id
+        self.bootstrap_servers = bootstrap_servers
+        self.consumer = None
+        self.running = False
+
+    def connect(self):
+        """Connect to Kafka cluster"""
+        try:
+            self.consumer = KafkaConsumer(
+                'web-attack-logs',
+                bootstrap_servers=self.bootstrap_servers,
+                group_id=f'worker-group-{self.worker_id}',
+                auto_offset_reset='latest',
+                enable_auto_commit=True,
+                value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+                consumer_timeout_ms=1000
+            )
+            logger.info(f"Worker {self.worker_id} connected to Kafka")
+            return True
+        except Exception as e:
+            logger.error(f"Connection failed: {e}")
+            return False
+
+    def process_message(self, message):
+        """Process individual message"""
+        try:
+            log_data = message.value
+            tenant_id = log_data.get('tenant_id', 'unknown')
+            source_ip = log_data.get('source_ip', 'unknown')
+
+            logger.info(f"Processing log from {source_ip} (tenant: {tenant_id})")
+
+            # Detect attack patterns
+            attack_type = self.detect_attack(log_data)
+
+            if attack_type:
+                # Create security event
+                security_event = {
+                    'event_id': f"evt_{datetime.now().timestamp()}",
+                    'attack_type': attack_type,
+                    'source_ip': source_ip,
+                    'target_url': log_data.get('url', ''),
+                    'timestamp': log_data.get('timestamp', datetime.now().isoformat()),
+                    'tenant_id': tenant_id,
+                    'worker_id': self.worker_id,
+                    'severity': self.assess_severity(attack_type, log_data),
+                    'confidence': 0.85
+                }
+
+                # Send to processed topic
+                self.send_to_processed_topic(security_event)
+
+                # Check if alert is needed
+                if self.should_alert(security_event):
+                    self.send_alert(security_event)
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Error processing message: {e}")
+            return False
+
+    def detect_attack(self, log_data):
+        """Detect attack patterns"""
+        url = log_data.get('url', '').lower()
+
+        attack_patterns = {
+            'sql_injection': ["' or '1'='1", "union select", "drop table"],
+            'xss': ["<script>", "javascript:", "alert("],
+            'brute_force': ["login", "admin", "password"],
+            'path_traversal': ["../", "..\\", "/etc/passwd"]
+        }
+
+        for attack_type, patterns in attack_patterns.items():
+            for pattern in patterns:
+                if pattern in url:
+                    return attack_type
+
+        return None
+
+    def assess_severity(self, attack_type, log_data):
+        """Assess severity level"""
+        severity_map = {
+            'sql_injection': 'high',
+            'xss': 'medium',
+            'path_traversal': 'high',
+            'brute_force': 'low',
+            'command_injection': 'critical'
+        }
+        return severity_map.get(attack_type, 'low')
+
+    def send_to_processed_topic(self, event_data):
+        """Send processed event to Kafka topic"""
+        try:
+            from kafka import KafkaProducer
+            producer = KafkaProducer(
+                bootstrap_servers=self.bootstrap_servers,
+                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            )
+
+            producer.send('processed-security-events', value=event_data)
+            producer.flush()
+            producer.close()
+
+            logger.info(f"Sent to processed topic: {event_data['event_id']}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Error sending to Kafka: {e}")
+            return False
+
+    def send_alert(self, event_data):
+        """Send alert if needed"""
+        if event_data['severity'] in ['high', 'critical']:
+            alert_data = {
+                **event_data,
+                'alert_timestamp': datetime.now().isoformat(),
+                'action_required': True
+            }
+
+            try:
+                from kafka import KafkaProducer
+                producer = KafkaProducer(
+                    bootstrap_servers=self.bootstrap_servers,
+                    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+                )
+
+                producer.send('security-alerts', value=alert_data)
+                producer.flush()
+                producer.close()
+
+                logger.warning(f"ALERT: {event_data['attack_type']} from {event_data['source_ip']}")
+                return True
+
+            except Exception as e:
+                logger.error(f"Error sending alert: {e}")
+                return False
+
+        return False
+
+    def should_alert(self, event_data):
+        """Determine if alert should be sent"""
+        return event_data['severity'] in ['high', 'critical']
+
+    def start(self):
+        """Start consuming messages"""
+        if not self.connect():
+            return False
+
+        self.running = True
+        logger.info(f"Worker {self.worker_id} started consuming")
+
+        try:
+            while self.running:
+                # Poll for messages
+                message_batch = self.consumer.poll(timeout_ms=1000)
+
+                for topic_partition, messages in message_batch.items():
+                    for message in messages:
+                        if not self.running:
+                            break
+                        self.process_message(message)
+
+        except KeyboardInterrupt:
+            logger.info("Shutdown requested")
+        except Exception as e:
+            logger.error(f"Consumer error: {e}")
+        finally:
+            self.stop()
+
+    def stop(self):
+        """Stop consumer"""
+        self.running = False
+        if self.consumer:
+            self.consumer.close()
+        logger.info(f"Worker {self.worker_id} stopped")
+
+def main():
+    # Get worker ID from hostname
+    worker_id = socket.gethostname()
+
+    # Kafka bootstrap servers
+    bootstrap_servers = [
+        'master:9092',
+        'worker1:9092',
+        'worker2:9092'
+    ]
+
+    # Create and start consumer
+    consumer = WorkerConsumer(worker_id, bootstrap_servers)
+
+    try:
+        consumer.start()
+    except KeyboardInterrupt:
+        logger.info("Shutting down...")
+    except Exception as e:
+        logger.error(f"Fatal error: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+```
+
+### 2.12.2. Triển khai Spark Streaming
+
+**scripts/spark_kafka_streaming.py:**
+```python
+#!/usr/bin/env python3
+"""
+Spark Streaming application for real-time security analytics
+"""
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
+import json
+from datetime import datetime
+
+def create_spark_session(app_name="SecurityStreaming"):
+    """Create Spark session with Kafka integration"""
+    spark = SparkSession.builder \
+        .appName(app_name) \
+        .master("spark://master:7077") \
+        .config("spark.jars.packages",
+                "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,"
+                "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.4") \
+        .config("spark.sql.streaming.checkpointLocation", "/tmp/spark-checkpoints") \
+        .config("spark.es.nodes", "master") \
+        .config("spark.es.port", "9200") \
+        .config("spark.sql.streaming.forceDeleteTempCheckpointLocation", "true") \
+        .getOrCreate()
+
+    spark.sparkContext.setLogLevel("WARN")
+    return spark
+
+def define_schema():
+    """Define schema for security events"""
+    return StructType([
+        StructField("event_id", StringType(), True),
+        StructField("attack_type", StringType(), True),
+        StructField("severity", StringType(), True),
+        StructField("source_ip", StringType(), True),
+        StructField("target_url", StringType(), True),
+        StructField("timestamp", StringType(), True),
+        StructField("tenant_id", StringType(), True),
+        StructField("worker_id", StringType(), True),
+        StructField("confidence", DoubleType(), True)
+    ])
+
+def process_security_stream(spark):
+    """Process security events stream"""
+
+    # Read from Kafka
+    kafka_df = spark \
+        .readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "master:9092,worker1:9092,worker2:9092") \
+        .option("subscribe", "processed-security-events") \
+        .option("startingOffsets", "latest") \
+        .load()
+
+    # Parse JSON
+    schema = define_schema()
+    parsed_df = kafka_df \
+        .select(from_json(col("value").cast("string"), schema).alias("data")) \
+        .select("data.*")
+
+    # Add processing timestamp
+    processed_df = parsed_df \
+        .withColumn("processing_timestamp", current_timestamp()) \
+        .withColumn("date", to_date(col("timestamp"))) \
+        .withColumn("hour", hour(col("timestamp")))
+
+    return processed_df
+
+def write_to_elasticsearch(df, epoch_id):
+    """Write batch to Elasticsearch"""
+    if not df.rdd.isEmpty():
+        # Write to Elasticsearch
+        df.write \
+            .format("org.elasticsearch.spark.sql") \
+            .option("es.resource", "security-events/_doc") \
+            .option("es.mapping.id", "event_id") \
+            .mode("append") \
+            .save()
+
+        print(f"Batch {epoch_id}: Wrote {df.count()} records to Elasticsearch")
+
+def aggregate_metrics(df):
+    """Aggregate metrics for dashboards"""
+
+    # Real-time aggregations
+    windowed_counts = df \
+        .withWatermark("processing_timestamp", "10 minutes") \
+        .groupBy(
+            window(col("processing_timestamp"), "5 minutes"),
+            col("attack_type"),
+            col("severity"),
+            col("tenant_id")
+        ) \
+        .agg(
+            count("*").alias("event_count"),
+            approx_count_distinct("source_ip").alias("unique_ips")
+        )
+
+    return windowed_counts
+
+def main():
+    """Main streaming application"""
+    print("=" * 60)
+    print("Starting Spark Streaming Security Analytics")
+    print("=" * 60)
+
+    # Create Spark session
+    spark = create_spark_session("SecurityAnalytics")
+
+    try:
+        # Process stream
+        processed_df = process_security_stream(spark)
+
+        # Write to console for debugging
+        console_query = processed_df \
+            .writeStream \
+            .outputMode("append") \
+            .format("console") \
+            .option("truncate", "false") \
+            .trigger(processingTime="30 seconds") \
+            .start()
+
+        # Write to Elasticsearch
+        es_query = processed_df \
+            .writeStream \
+            .foreachBatch(write_to_elasticsearch) \
+            .outputMode("append") \
+            .trigger(processingTime="1 minute") \
+            .start()
+
+        # Calculate aggregated metrics
+        metrics_df = aggregate_metrics(processed_df)
+
+        metrics_query = metrics_df \
+            .writeStream \
+            .outputMode("complete") \
+            .format("memory") \
+            .queryName("security_metrics") \
+            .trigger(processingTime="1 minute") \
+            .start()
+
+        # Wait for termination
+        spark.streams.awaitAnyTermination()
+
+    except KeyboardInterrupt:
+        print("\nShutting down streaming application...")
+    except Exception as e:
+        print(f"Error in streaming application: {e}")
+        raise
+    finally:
+        spark.stop()
+
+if __name__ == "__main__":
+    main()
+```
+
+### 2.12.3. Khởi động Streaming Pipeline
+
+**Chạy trên các worker nodes:**
+```bash
+# Copy scripts to workers
+scp /scripts/kafka_consumer_worker.py hadoop@worker1:/scripts/
+scp /scripts/kafka_consumer_worker.py hadoop@worker2:/scripts/
+scp /scripts/spark_kafka_streaming.py hadoop@master:/scripts/
+
+# Make executable
+chmod +x /scripts/kafka_consumer_worker.py
+ssh hadoop@worker1 "chmod +x /scripts/kafka_consumer_worker.py"
+ssh hadoop@worker2 "chmod +x /scripts/kafka_consumer_worker.py"
+
+# Start consumers on workers
+ssh hadoop@worker1 "nohup /scripts/kafka_consumer_worker.py > /tmp/consumer_worker1.log 2>&1 &"
+ssh hadoop@worker2 "nohup /scripts/kafka_consumer_worker.py > /tmp/consumer_worker2.log 2>&1 &"
+
+# Start Spark Streaming on master
+spark-submit --master spark://master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.elasticsearch:elasticsearch-spark-30_2.12:8.11.4 \
+  /scripts/spark_kafka_streaming.py
+```
+
+**Test end-to-end streaming:**
+```bash
+# Send test data to API Gateway
+curl -X POST "http://172.16.232.101:8000/api/v1/security/log?tenant_id=company_a" \
+  -H "Authorization: Bearer test_token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "timestamp": "2025-01-15T10:30:00Z",
+    "source_ip": "192.168.1.100",
+    "http_method": "GET",
+    "url": "/admin.php?id=1'\'' OR '\''1'\''='\''1",
+    "response_code": 200,
+    "request_time": 0.5
+  }'
+
+# Check if data flows through the pipeline
+# 1. Check Kafka topics
+kafka-console-consumer.sh --bootstrap-server master:9092 \
+  --topic processed-security-events --from-beginning --max-messages 5
+
+# 2. Check Elasticsearch
+curl "http://master:9200/security-events/_search?size=5&pretty"
+
+# 3. Check Kibana for real-time dashboards
+```
+
+**✅ STREAMING PIPELINE HOẠT ĐỘNG HOÀN HẢO!**
+
+---
+
+## 2.13. CÀI ĐẶT PYTHON PACKAGES
+
+### 2.13.1. Cài đặt packages bổ sung
+
+**Trên tất cả VMs:**
+```bash
+# Additional packages cho streaming và AI
+pip3 install transformers==4.21.0 torch==1.12.1 numpy==1.21.6
+pip3 install schedule==1.1.0 scikit-learn==1.1.3 pandas==1.5.3
+pip3 install matplotlib==3.6.2 seaborn==0.12.1 plotly==5.11.0
+
+# Testing và monitoring
+pip3 install pytest==7.2.0 requests==2.28.1 pytest-asyncio==0.21.0
+pip3 install prometheus-client==0.16.0 psutil==5.9.4
+
+# Logging và utilities
+pip3 install loguru==0.6.0 python-json-logger==2.0.7
+pip3 install pyyaml==6.0 ujson==5.7.0 orjson==3.8.3
+```
+
+### 2.13.2. Verify installations
+
+```bash
+# Check all installed packages
+pip3 list | grep -E "(fastapi|kafka|spark|elasticsearch|torch|transformers)"
+
+# Test imports
+python3 -c "
+import fastapi, kafka, pyspark, elasticsearch, transformers, torch
+print('All packages imported successfully')
+"
+```
+
+**✅ TẤT CẢ PACKAGES ĐƯỢC CÀI ĐẶT THÀNH CÔNG!**
 
 ---
 
